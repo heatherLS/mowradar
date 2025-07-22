@@ -155,15 +155,27 @@ Write 2 short, natural-sounding talking points a rep can say. Use casual, confid
 """
     return prompt
 
+import openai
+
+client = openai.OpenAI(api_key=OPENAI_API_KEY)
+
 def generate_blurb(prompt, model="gpt-4o"):
-    openai.api_key = OPENAI_API_KEY
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model=model,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.85,
         max_tokens=500
     )
-    message = response['choices'][0]['message']['content']
+    message = response.choices[0].message.content
+
+    # Token tracking
+    usage = response.usage
+    prompt_tokens = usage.prompt_tokens
+    completion_tokens = usage.completion_tokens
+    total_tokens = usage.total_tokens
+
+    return message, prompt_tokens, completion_tokens, total_tokens
+
     
     # Token tracking
     usage = response['usage']
